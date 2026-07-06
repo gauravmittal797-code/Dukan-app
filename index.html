@@ -944,27 +944,18 @@ function roundRect(ctx,x,y,w,h,r){
   ctx.arcTo(x,y,x+w,y,r);
   ctx.closePath();
 }
-function setupPWA(){
-  try{
-    const canvas = document.createElement('canvas'); canvas.width=512; canvas.height=512;
+function setupoldcanvas() {
+    const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#8C2F39'; ctx.fillRect(0,0,512,512);
-    ctx.fillStyle = '#F1E8D6'; roundRect(ctx,90,80,332,352,28); ctx.fill();
+    ctx.fillStyle = '#8C2F39'; 
+    ctx.fillStyle = '#F1E8D6'; 
     ctx.fillStyle = '#8C2F39';
     ctx.fillRect(130,155,252,22);
     ctx.fillRect(130,215,252,22);
     ctx.fillRect(130,275,160,22);
     const iconData = canvas.toDataURL('image/png');
+}
 
-    const manifest = {
-      name: "मेरी दुकान — हिसाब किताब",
-      short_name: "दुकान हिसाब",
-      start_url: ".",
-      scope: ".",
-      display: "standalone",
-      background_color: "#F1E8D6",
-      theme_color: "#8C2F39"
-    
 // ---------- New Standard PWA Setup ----------
 function setupStandardPWA() {
     const link = document.createElement('link');
