@@ -964,7 +964,8 @@ function setupPWA(){
       display: "standalone",
       background_color: "#F1E8D6",
       theme_color: "#8C2F39"
-    // ---------- New Standard PWA Setup ----------
+    
+// ---------- New Standard PWA Setup ----------
 function setupStandardPWA() {
     const link = document.createElement('link');
     link.rel = 'manifest';
@@ -973,17 +974,16 @@ function setupStandardPWA() {
 
     const appleIcon = document.createElement('link');
     appleIcon.rel = 'apple-touch-icon';
-    appleIcon.href = './icon-192.png';
+    appleIcon.href = 'icon-192.png';
     document.head.appendChild(appleIcon);
 
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-        navigator.serviceWorker.register('./sw.js')
+        navigator.serviceWorker.register('sw.js')
             .then(reg => console.log('Service Worker Registered!'))
             .catch(err => console.error('Service Worker Failed', err));
     }
 }
 setupStandardPWA();
-
 loadDB();
 </script>
 </body>
