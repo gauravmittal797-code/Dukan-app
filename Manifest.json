@@ -1,6 +1,7 @@
 {
   "name": "मेरी दुकान — हिसाब किताब",
-  "short_name": "दुकान हिसाब",
+  "short_name": "मिरि दुकान",
+  "description": "हार्डवेयर और पेंट की दुकान का हिसाब-किताब और इन्वेंटरी मैनेजमेंट ऐप।",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
