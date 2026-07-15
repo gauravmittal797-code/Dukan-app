@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>मेरी दुकान — हिसाब किताब</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="दुकान हिसाब">
+<meta name="theme-color" content="#8C2F39">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --paper:#F1E8D6;
+    --paper-dark:#E7DBC1;
+    --red:#8C2F39;
+    --red-dark:#6E2029;
+    --navy:#1F3350;
+    --green:#3D6B4A;
+    --gold:#B8863B;
+    --charcoal:#2B2622;
+    --line:#C9B99A;
+    --card:#FAF5E8;
+    --danger:#B23A3A;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:
+      repeating-linear-gradient(180deg, transparent 0px, transparent 27px, var(--line) 28px),
+      var(--paper);
+    color:var(--charcoal);
+    min-height:100vh;
+    padding-bottom:78px;
+  }
+  .brand-font{font-family:'Baloo 2',cursive;}
+  .mono{font-family:'Roboto Mono',monospace;}
+
+  header.top{
+    background:var(--red);
+    color:var(--paper);
+    padding:16px 18px 14px;
+    position:relative;
+    border-bottom:4px solid var(--red-dark);
+    box-shadow:0 2px 0 rgba(0,0,0,0.08);
+  }
+  header.top::before{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:10px;
+    background:repeating-linear-gradient(180deg, var(--gold) 0 6px, var(--red-dark) 6px 12px);
+  }
+  header.top h1{
+    margin:0 0 2px 14px; font-size:20px; font-family:'Baloo 2',cursive; font-weight:700;
+    letter-spacing:0.3px;
+  }
+  header.top p{margin:0 0 0 14px; font-size:12px; opacity:0.85;}
+
+  #app{max-width:640px; margin:0 auto; padding:14px;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px;
+    margin-bottom:12px;
+    box-shadow:0 1px 3px rgba(60,40,10,0.08);
+  }
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .stat{
+    background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px;
+    border-left:5px solid var(--gold);
+  }
+  .stat.red{border-left-color:var(--red);}
+  .stat.green{border-left-color:var(--green);}
+  .stat.navy{border-left-color:var(--navy);}
+  .stat .label{font-size:11px; color:#6b5f4a; font-weight:600; text-transform:uppercase; letter-spacing:0.4px;}
+  .stat .value{font-size:19px; font-weight:700; font-family:'Roboto Mono',monospace; margin-top:4px;}
+
+  h2.section-title{
+    font-family:'Baloo 2',cursive; font-size:16px; color:var(--red-dark);
+    margin:18px 0 8px; padding-bottom:4px; border-bottom:2px dashed var(--line);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+
+  .row-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 4px; border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .row-item:last-child{border-bottom:none;}
+  .row-item .name{font-weight:600; font-size:14.5px;}
+  .row-item .sub{font-size:12px; color:#7a6d55; margin-top:2px;}
+  .row-item .amt{font-family:'Roboto Mono',monospace; font-weight:700; font-size:14px;}
+  .amt.owe{color:var(--red);}
+  .amt.ok{color:var(--green);}
+
+  .btn{
+    display:inline-flex; align-items:center; gap:6px; justify-content:center;
+    background:var(--navy); color:#fff; border:none; border-radius:8px;
+    padding:9px 14px; font-size:13.5px; font-weight:600; cursor:pointer;
+    font-family:'Inter',sans-serif;
+  }
+  .btn.red{background:var(--red);}
+  .btn.green{background:var(--green);}
+  .btn.gold{background:var(--gold); color:#3a2b0d;}
+  .btn.ghost{background:transparent; color:var(--navy); border:1.5px solid var(--navy); padding:7px 12px;}
+  .btn.sm{padding:6px 10px; font-size:12px;}
+  .btn.block{width:100%;}
+  .btn:disabled{opacity:0.5;}
+  .btn.danger{background:var(--danger);}
+
+  input, select{
+    width:100%; padding:9px 10px; border:1.5px solid var(--line); border-radius:7px;
+    font-size:14px; font-family:'Inter',sans-serif; background:#fff; color:var(--charcoal);
+  }
+  label{font-size:12px; font-weight:600; color:#6b5f4a; display:block; margin-bottom:4px;}
+  .field{margin-bottom:10px;}
+
+  .search-bar{margin-bottom:10px;}
+
+  .empty{
+    text-align:center; padding:30px 10px; color:#8a7c60; font-size:13.5px;
+  }
+
+  nav.bottom{
+    position:fixed; bottom:0; left:0; right:0; background:var(--navy);
+    display:flex; justify-content:space-around; padding:8px 4px 10px;
+    box-shadow:0 -2px 6px rgba(0,0,0,0.15); z-index:50;
+  }
+  nav.bottom button{
+    background:none; border:none; color:#b9c4d6; display:flex; flex-direction:column;
+    align-items:center; gap:2px; font-size:10.5px; font-family:'Inter',sans-serif;
+    cursor:pointer; padding:4px 8px; border-radius:8px; font-weight:600;
+  }
+  nav.bottom button.active{color:#fff; background:rgba(255,255,255,0.12);}
+  nav.bottom svg{width:20px; height:20px;}
+
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(30,20,10,0.55); z-index:100;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .modal-sheet{
+    background:var(--paper); width:100%; max-width:640px; max-height:90vh; overflow-y:auto;
+    border-radius:16px 16px 0 0; padding:16px 16px 20px; border-top:4px solid var(--red);
+  }
+  .modal-sheet h3{
+    font-family:'Baloo 2',cursive; color:var(--red-dark); margin:0 0 12px; font-size:17px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .modal-sheet h3 .x{cursor:pointer; font-size:20px; color:#8a7c60; font-family:sans-serif;}
+
+  .item-row{
+    display:grid; grid-template-columns:2fr 0.7fr 0.9fr auto; gap:6px; align-items:end;
+    margin-bottom:8px; background:#fff; padding:8px; border-radius:8px; border:1px solid var(--line);
+  }
+  .item-row .rm{background:var(--danger); color:#fff; border:none; border-radius:6px; width:28px; height:34px; cursor:pointer; font-weight:700;}
+  .subtotal-line{
+    display:flex; justify-content:space-between; padding-top:8px; margin-top:6px;
+    border-top:1.5px dashed var(--line); font-family:'Roboto Mono',monospace; font-weight:700;
+  }
+  .badge{
+    display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:20px;
+    background:var(--gold); color:#3a2b0d;
+  }
+  .badge.low{background:var(--danger); color:#fff;}
+  .ledger-entry{padding:9px 4px; border-bottom:1px dashed var(--line);}
+  .ledger-entry:last-child{border-bottom:none;}
+  .ledger-entry .top-row{display:flex; justify-content:space-between; font-size:13px; font-weight:600;}
+  .ledger-entry .items-list{font-size:11.5px; color:#7a6d55; margin-top:2px; line-height:1.5;}
+
+  table.khata-table{width:100%; border-collapse:collapse; font-size:12px;}
+  table.khata-table th{
+    text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:0.3px;
+    color:#7a6d55; border-bottom:2px solid var(--red); padding:6px 4px; font-weight:700;
+  }
+  table.khata-table td{padding:6px 4px; border-bottom:1px dashed var(--line); vertical-align:top;}
+  table.khata-table tr.entry-header td{font-weight:700; font-size:12.5px; background:rgba(184,134,59,0.08);}
+  table.khata-table tr.entry-item td{color:#5b5040; font-size:11.5px;}
+  table.khata-table tr.entry-item td:nth-child(2){padding-left:14px;}
+  table.khata-table td.date-col{white-space:nowrap; font-family:'Roboto Mono',monospace; font-size:11px;}
+  table.khata-table td.mono{font-family:'Roboto Mono',monospace; white-space:nowrap;}
+  table.khata-table td.bal-col{font-family:'Roboto Mono',monospace; font-weight:700; white-space:nowrap;}
+  table.khata-table .del-link{cursor:pointer; font-size:10px; color:var(--danger); font-weight:600; margin-left:6px;}
+  .khata-scroll{overflow-x:auto;}
+  .toast{
+    position:fixed; top:14px; left:50%; transform:translateX(-50%); background:var(--navy); color:#fff;
+    padding:9px 16px; border-radius:8px; font-size:13px; z-index:200; box-shadow:0 3px 10px rgba(0,0,0,0.2);
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>मेरी दुकान — हिसाब किताब</h1>
+  <p>उधार, स्टॉक और सप्लायर का पूरा हिसाब</p>
+</header>
+<div id="app"></div>
+<div id="modalRoot"></div>
+<nav class="bottom" id="bottomNav"></nav>
+
+<script>
+// ---------- Storage & State ----------
+let db = { items: [], customers: [], suppliers: [], custEntries: [], suppEntries: [], stockLog: [] };
+let activeTab = 'dashboard';
+let detailCustomerId = null;
+let detailSupplierId = null;
+let detailItemId = null;
+let loaded = false;
+
+function uid(p){ return p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function inr(n){ n = Number(n||0); return '₹' + n.toLocaleString('en-IN', {maximumFractionDigits:2}); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function fmtDate(d){
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+}
+
+async function loadDB(){
+  try{
+    const r = await window.storage.get('shop-db-v1', false);
+    if(r && r.value){ db = JSON.parse(r.value); }
+  }catch(e){ /* no existing data yet */ }
+  if(!db.stockLog) db.stockLog = [];
+  loaded = true;
+  render();
+}
+async function saveDB(){
+  try{
+    await window.storage.set('shop-db-v1', JSON.stringify(db), false);
+  }catch(e){
+    console.error('save failed', e);
+    showToast('⚠️ डेटा सेव करने में दिक्कत हुई');
+  }
+}
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 1800);
+}
+
+// ---------- Derived helpers ----------
+function custBalance(custId){
+  return db.custEntries.filter(e=>e.customerId===custId).reduce((s,e)=>s+(e.debit-e.credit),0);
+}
+function suppBalance(suppId){
+  return db.suppEntries.filter(e=>e.supplierId===suppId).reduce((s,e)=>s+(e.debit-e.credit),0);
+}
+function totalUdhar(){ return db.customers.reduce((s,c)=>s+custBalance(c.id),0); }
+function totalPayable(){ return db.suppliers.reduce((s,c)=>s+suppBalance(c.id),0); }
+function stockValue(){ return db.items.reduce((s,i)=>s+(Number(i.stock)*Number(i.costPrice||0)),0); }
+function itemById(id){ return db.items.find(i=>i.id===id); }
+
+// ---------- Icons ----------
+const ICONS = {
+  dashboard:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>',
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6"/><circle cx="17" cy="9" r="2.8"/><path d="M16 14c2.8 0.3 5 2.3 5 6"/></svg>',
+  truck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="6" width="13" height="10" rx="1"/><path d="M14 9h4l3 3v4h-7z"/><circle cx="6" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>'
+};
+
+// ---------- Render root ----------
+function render(){
+  if(!loaded){ document.getElementById('app').innerHTML = '<div class="empty">लोड हो रहा है...</div>'; return; }
+  renderNav();
+  const app = document.getElementById('app');
+  if(activeTab==='dashboard') app.innerHTML = renderDashboard();
+  else if(activeTab==='inventory') app.innerHTML = renderInventory();
+  else if(activeTab==='customers') app.innerHTML = detailCustomerId ? renderCustomerDetail(detailCustomerId) : renderCustomers();
+  else if(activeTab==='suppliers') app.innerHTML = detailSupplierId ? renderSupplierDetail(detailSupplierId) : renderSuppliers();
+}
+function renderNav(){
+  const tabs = [
+    {id:'dashboard', label:'डैशबोर्ड', icon:ICONS.dashboard},
+    {id:'inventory', label:'स्टॉक', icon:ICONS.box},
+    {id:'customers', label:'उधार खाता', icon:ICONS.users},
+    {id:'suppliers', label:'सप्लायर', icon:ICONS.truck},
+  ];
+  document.getElementById('bottomNav').innerHTML = tabs.map(t=>`
+    <button class="${activeTab===t.id?'active':''}" onclick="switchTab('${t.id}')">
+      ${t.icon}<span>${t.label}</span>
+    </button>`).join('');
+}
+function switchTab(id){
+  activeTab=id; detailCustomerId=null; detailSupplierId=null; detailItemId=null; render();
+}
+
+// ================= DASHBOARD =================
+function renderDashboard(){
+  const low = db.items.filter(i=>Number(i.stock) <= Number(i.lowStock||5));
+  const recent = [
+    ...db.custEntries.map(e=>({...e, kind:'customer', name:(db.customers.find(c=>c.id===e.customerId)||{}).name})),
+    ...db.suppEntries.map(e=>({...e, kind:'supplier', name:(db.suppliers.find(c=>c.id===e.supplierId)||{}).name})),
+  ].sort((a,b)=> (b.date+b.id).localeCompare(a.date+a.id)).slice(0,6);
+
+  return `
+    <div class="grid2">
+      <div class="stat red"><div class="label">कुल उधार (लेना है)</div><div class="value">${inr(totalUdhar())}</div></div>
+      <div class="stat navy"><div class="label">सप्लायर को देना है</div><div class="value">${inr(totalPayable())}</div></div>
+      <div class="stat gold" style="border-left-color:var(--gold)"><div class="label">कुल स्टॉक वैल्यू</div><div class="value">${inr(stockValue())}</div></div>
+      <div class="stat green"><div class="label">कुल आइटम</div><div class="value">${db.items.length}</div></div>
+    </div>
+
+    <h2 class="section-title">⚠️ कम स्टॉक (${low.length})</h2>
+    <div class="card">
+      ${low.length===0 ? '<div class="empty">सब आइटम पर्याप्त स्टॉक में हैं ✅</div>' :
+        low.map(i=>`<div class="row-item"><div><div class="name">${esc(i.name)}</div><div class="sub">${i.unit}</div></div><div class="amt owe">${i.stock} ${i.unit} बचा</div></div>`).join('')}
+    </div>
+
+    <h2 class="section-title">हाल की एंट्री</h2>
+    <div class="card">
+      ${recent.length===0 ? '<div class="empty">अभी कोई एंट्री नहीं</div>' :
+        recent.map(e=>`
+        <div class="row-item" style="cursor:default">
+          <div><div class="name">${esc(e.name||'—')} ${e.kind==='customer'?'(ग्राहक)':'(सप्लायर)'}</div>
+          <div class="sub">${fmtDate(e.date)} · ${e.type==='sale'?'बिक्री':e.type==='purchase'?'खरीद':'पेमेंट'}</div></div>
+          <div class="amt ${e.debit>e.credit?'owe':'ok'}">${inr(Math.max(e.debit,e.credit))}</div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+// ================= INVENTORY =================
+function renderInventory(){
+  if(detailItemId) return renderItemDetail(detailItemId);
+  return `
+    <input class="search-bar" placeholder="🔍 आइटम खोजें..." oninput="filterInventory(this.value)" id="invSearch">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <div style="font-size:13px; color:#7a6d55;">कुल ${db.items.length} आइटम</div>
+      <button class="btn green sm" onclick="openItemModal()">+ नया आइटम</button>
+    </div>
+    <div class="card" id="invList">${renderInventoryRows(db.items)}</div>
+  `;
+}
+function renderInventoryRows(list){
+  if(list.length===0) return '<div class="empty">कोई आइटम नहीं मिला</div>';
+  return list.map(i=>{
+    const low = Number(i.stock) <= Number(i.lowStock||5);
+    return `
+    <div class="row-item" onclick="openItemDetail('${i.id}')">
+      <div><div class="name">${esc(i.name)} ${low?'<span class="badge low">कम स्टॉक</span>':''}</div>
+      <div class="sub">विक्रय: ${inr(i.salePrice)} / ${i.unit} · लागत: ${inr(i.costPrice)}</div></div>
+      <div class="amt ${low?'owe':'ok'}">${i.stock} ${i.unit}</div>
+    </div>`;
+  }).join('');
+}
+function filterInventory(q){
+  q = q.trim().toLowerCase();
+  const list = db.items.filter(i=>i.name.toLowerCase().includes(q));
+  document.getElementById('invList').innerHTML = renderInventoryRows(list);
+}
+function openItemDetail(id){ detailItemId = id; render(); }
+function itemLedgerTableMarkup(id){
+  const it = itemById(id);
+  const movements = [];
+  db.stockLog.filter(l=>l.itemId===id).forEach(l=>movements.push({date:l.date, sortKey:l.date+l.id, qty:l.qty, label: l.type==='opening'?'शुरुआती स्टॉक':'मैनुअल सुधार'}));
+  db.suppEntries.filter(e=>e.type==='purchase').forEach(e=>{
+    const supp = db.suppliers.find(s=>s.id===e.supplierId);
+    (e.items||[]).filter(li=>li.itemId===id).forEach(li=>{
+      movements.push({date:e.date, sortKey:e.date+e.id, qty:li.qty, label:`खरीदा — ${supp?esc(supp.name):'सप्लायर'}`});
+    });
+  });
+  db.custEntries.filter(e=>e.type==='sale').forEach(e=>{
+    const cust = db.customers.find(c=>c.id===e.customerId);
+    (e.items||[]).filter(li=>li.itemId===id).forEach(li=>{
+      movements.push({date:e.date, sortKey:e.date+e.id, qty:-li.qty, label:`बिका — ${cust?esc(cust.name):'ग्राहक'}`});
+    });
+  });
+  movements.sort((a,b)=>a.sortKey.localeCompare(b.sortKey));
+  let running = 0;
+  const rows = movements.map(m=>{
+    running += Number(m.qty);
+    const sign = m.qty>=0 ? '+' : '−';
+    return `
+      <tr class="entry-header">
+        <td class="date-col">${fmtDate(m.date)}</td>
+        <td>${m.label}</td>
+        <td class="mono">${sign}${Math.abs(m.qty)} ${esc(it.unit)}</td>
+        <td class="bal-col">${running} ${esc(it.unit)}</td>
+      </tr>`;
+  }).join('');
+  const tableHtml = movements.length===0 ? '<div class="empty">अभी कोई मूवमेंट नहीं</div>' : `
+    <table class="khata-table">
+      <thead><tr><th>तारीख</th><th>विवरण</th><th>बदलाव</th><th>बचा स्टॉक</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  return {tableHtml, running};
+}
+function renderItemDetail(id){
+  const it = itemById(id);
+  if(!it){ detailItemId=null; return renderInventory(); }
+  const low = Number(it.stock) <= Number(it.lowStock||5);
+  const {tableHtml} = itemLedgerTableMarkup(id);
+  return `
+    <button class="btn ghost sm" onclick="detailItemId=null;render()">← वापस</button>
+    <div class="card" style="margin-top:10px;">
+      <div class="name" style="font-size:17px;">${esc(it.name)} ${low?'<span class="badge low">कम स्टॉक</span>':''}</div>
+      <div class="sub">यूनिट: ${esc(it.unit)} · लागत: ${inr(it.costPrice)} · विक्रय: ${inr(it.salePrice)}</div>
+      <div style="margin-top:8px; font-size:20px;" class="mono ${low?'amt owe':'amt ok'}">${it.stock} ${esc(it.unit)} बचा है</div>
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn ghost" style="flex:1" onclick="openItemModal('${it.id}')">✏️ एडिट करें</button>
+      </div>
+    </div>
+    <h2 class="section-title">स्टॉक मूवमेंट (तारीख अनुसार)</h2>
+    <div class="card khata-scroll">${tableHtml}</div>
+  `;
+}
+function openItemModal(id){
+  const it = id ? itemById(id) : null;
+  setModal(`
+    <h3>${it?'आइटम एडिट करें':'नया आइटम जोड़ें'} <span class="x" onclick="closeModal()">✕</span></h3>
+    <div class="field"><label>आइटम का नाम</label><input id="f_name" value="${it?esc(it.name):''}" placeholder="जैसे: Asian Paints 1L"></div>
+    <div class="field"><label>यूनिट</label><input id="f_unit" value="${it?esc(it.unit):''}" placeholder="जैसे: piece, kg, litre"></div>
+    <div class="grid2">
+      <div class="field"><label>स्टॉक (मात्रा)</label><input id="f_stock" type="number" value="${it?it.stock:''}"></div>
+      <div class="field"><label>कम स्टॉक अलर्ट</label><input id="f_low" type="number" value="${it?(it.lowStock||5):5}"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>लागत मूल्य (कॉस्ट)</label><input id="f_cost" type="number" value="${it?it.costPrice:''}"></div>
+      <div class="field"><label>बिक्री मूल्य (सेल)</label><input id="f_sale" type="number" value="${it?it.salePrice:''}"></div>
+    </div>
+    <button class="btn green block" onclick="saveItem(${it?`'${it.id}'`:'null'})">${it?'सेव करें':'जोड़ें'}</button>
+    ${it?`<button class="btn danger block" style="margin-top:8px" onclick="deleteItem('${it.id}')">आइटम हटाएं</button>`:''}
+  `);
+}
+function saveItem(id){
+  const name = document.getElementById('f_name').value.trim();
+  const unit = document.getElementById('f_unit').value.trim() || 'piece';
+  const stock = Number(document.getElementById('f_stock').value || 0);
+  const low = Number(document.getElementById('f_low').value || 5);
+  const cost = Number(document.getElementById('f_cost').value || 0);
+  const sale = Number(document.getElementById('f_sale').value || 0);
+  if(!name){ showToast('⚠️ नाम डालें'); return; }
+  if(id){
+    const it = itemById(id);
+    const oldStock = Number(it.stock);
+    Object.assign(it, {name, unit, stock, lowStock:low, costPrice:cost, salePrice:sale});
+    if(stock !== oldStock){
+      db.stockLog.push({id:uid('sl'), itemId:id, date:todayStr(), qty:(stock-oldStock), type:'adjustment'});
+    }
+  } else {
+    const newItem = {id:uid('item'), name, unit, stock, lowStock:low, costPrice:cost, salePrice:sale};
+    db.items.push(newItem);
+    if(stock>0) db.stockLog.push({id:uid('sl'), itemId:newItem.id, date:todayStr(), qty:stock, type:'opening'});
+  }
+  saveDB(); closeModal(); render(); showToast('✅ सेव हो गया');
+}
+function deleteItem(id){
+  if(!confirm('क्या आप वाकई इस आइटम को हटाना चाहते हैं?')) return;
+  db.items = db.items.filter(i=>i.id!==id);
+  db.stockLog = db.stockLog.filter(l=>l.itemId!==id);
+  detailItemId=null;
+  saveDB(); closeModal(); render();
+}
+
+// ================= CUSTOMERS =================
+function renderCustomers(){
+  const list = db.customers.map(c=>({...c, bal:custBalance(c.id)}));
+  return `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <div style="font-size:13px; color:#7a6d55;">कुल उधार: <b>${inr(totalUdhar())}</b></div>
+      <button class="btn red sm" onclick="openCustomerModal()">+ नया ग्राहक</button>
+    </div>
+    <div class="card">
+      ${list.length===0?'<div class="empty">कोई ग्राहक नहीं जोड़ा गया</div>':
+      list.map(c=>`
+        <div class="row-item" onclick="openCustomerDetail('${c.id}')">
+          <div><div class="name">${esc(c.name)}</div><div class="sub">${c.phone||''}</div></div>
+          <div class="amt ${c.bal>0?'owe':'ok'}">${c.bal>0?inr(c.bal)+' उधार':'क्लियर ✅'}</div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+function openCustomerModal(){
+  setModal(`
+    <h3>नया ग्राहक <span class="x" onclick="closeModal()">✕</span></h3>
+    <div class="field"><label>नाम</label><input id="f_cname" placeholder="ग्राहक का नाम"></div>
+    <div class="field"><label>फोन नंबर (वैकल्पिक)</label><input id="f_cphone" placeholder="मोबाइल नंबर"></div>
+    <button class="btn red block" onclick="saveCustomer()">जोड़ें</button>
+  `);
+}
+function saveCustomer(){
+  const name = document.getElementById('f_cname').value.trim();
+  const phone = document.getElementById('f_cphone').value.trim();
+  if(!name){ showToast('⚠️ नाम डालें'); return; }
+  const c = {id:uid('cust'), name, phone};
+  db.customers.push(c); saveDB(); closeModal();
+  detailCustomerId = c.id; activeTab='customers'; render();
+}
+function openCustomerDetail(id){ detailCustomerId=id; render(); }
+function custLedgerTableMarkup(id){
+  const entries = db.custEntries.filter(e=>e.customerId===id).sort((a,b)=>(a.date+a.id).localeCompare(b.date+b.id));
+  let running = 0;
+  const rowsHtml = entries.map(e=>{
+    if(e.type==='sale'){
+      running += (e.debit - e.credit);
+      const itemRows = (e.items||[]).map(it=>`
+        <tr class="entry-item">
+          <td class="date-col"></td>
+          <td>${esc(it.name)}</td>
+          <td>${it.qty} ${esc(it.unit)}</td>
+          <td class="mono">${inr(it.qty*it.price)}</td>
+          <td></td>
+        </tr>`).join('');
+      const paidRow = e.credit>0 ? `
+        <tr class="entry-item">
+          <td class="date-col"></td>
+          <td colspan="2">उसी वक़्त दिया</td>
+          <td class="mono">−${inr(e.credit)}</td>
+          <td></td>
+        </tr>` : '';
+      return `
+        <tr class="entry-header">
+          <td class="date-col">${fmtDate(e.date)}</td>
+          <td>बिक्री <span class="del-link" onclick="deleteCustEntry('${e.id}')">हटाएं</span></td>
+          <td></td>
+          <td class="mono">+${inr(e.debit)}</td>
+          <td class="bal-col">${inr(running)}</td>
+        </tr>${itemRows}${paidRow}`;
+    } else {
+      running -= e.credit;
+      return `
+        <tr class="entry-header">
+          <td class="date-col">${fmtDate(e.date)}</td>
+          <td>पेमेंट मिला${e.note?' ('+esc(e.note)+')':''} <span class="del-link" onclick="deleteCustEntry('${e.id}')">हटाएं</span></td>
+          <td></td>
+          <td class="mono">−${inr(e.credit)}</td>
+          <td class="bal-col">${inr(running)}</td>
+        </tr>`;
+    }
+  }).join('');
+  const tableHtml = entries.length===0 ? '<div class="empty">अभी कोई एंट्री नहीं</div>' : `
+    <table class="khata-table">
+      <thead><tr><th>तारीख</th><th>विवरण</th><th>मात्रा</th><th>राशि</th><th>बैलेंस</th></tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>`;
+  return {tableHtml, balance: running};
+}
+function renderCustomerDetail(id){
+  const c = db.customers.find(x=>x.id===id);
+  if(!c){ detailCustomerId=null; return renderCustomers(); }
+  const bal = custBalance(id);
+  const {tableHtml} = custLedgerTableMarkup(id);
+  return `
+    <button class="btn ghost sm" onclick="detailCustomerId=null;render()">← वापस</button>
+    <div class="card" style="margin-top:10px;">
+      <div class="name" style="font-size:17px;">${esc(c.name)}</div>
+      <div class="sub">${c.phone||'फोन नंबर नहीं'}</div>
+      <div style="margin-top:8px; font-size:20px;" class="mono ${bal>0?'amt owe':'amt ok'}">${bal>0?inr(bal)+' उधार बाकी':'हिसाब क्लियर ✅'}</div>
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn green" style="flex:1" onclick="openSaleModal('${c.id}')">+ नई बिक्री</button>
+        <button class="btn navy" style="flex:1; background:var(--navy)" onclick="openCustPaymentModal('${c.id}')">₹ पेमेंट मिला</button>
+      </div>
+      <button class="btn gold block" style="margin-top:8px" onclick="shareLedgerImage('customer','${c.id}')">📤 WhatsApp पर भेजें</button>
+    </div>
+    <h2 class="section-title">खाता (तारीख अनुसार)</h2>
+    <div class="card khata-scroll">${tableHtml}</div>
+  `;
+}
+function openSaleModal(custId){
+  setModal(`
+    <h3>नई बिक्री <span class="x" onclick="closeModal()">✕</span></h3>
+    <div class="field"><label>तारीख</label><input id="s_date" type="date" value="${todayStr()}"></div>
+    <div id="saleItemRows"></div>
+    <button class="btn ghost sm" onclick="addSaleRow()">+ आइटम जोड़ें</button>
+    <div class="subtotal-line"><span>कुल राशि</span><span id="saleTotal">₹0</span></div>
+    <div class="field" style="margin-top:10px;"><label>अभी कितना पैसा मिला</label><input id="s_paid" type="number" value="0" oninput="updateSaleTotal()"></div>
+    <div class="subtotal-line"><span>बचा उधार</span><span id="saleUdhar">₹0</span></div>
+    <button class="btn green block" style="margin-top:10px" onclick="submitSale('${custId}')">बिक्री सेव करें</button>
+  `);
+  window.__saleRows = [];
+  addSaleRow();
+}
+function addSaleRow(){
+  const idx = window.__saleRows.length;
+  window.__saleRows.push({itemId:'', qty:1, price:0});
+  renderSaleRows();
+}
+function renderSaleRows(){
+  const opts = db.items.map(i=>`<option value="${i.id}">${esc(i.name)} (${i.stock} ${i.unit})</option>`).join('');
+  document.getElementById('saleItemRows').innerHTML = window.__saleRows.map((r,idx)=>`
+    <div class="item-row">
+      <div><label>आइटम</label><select onchange="setSaleRow(${idx},'itemId',this.value)"><option value="">-- चुनें --</option>${opts.replace(`value="${r.itemId}"`, `value="${r.itemId}" selected`)}</select></div>
+      <div><label>मात्रा</label><input type="number" value="${r.qty}" oninput="setSaleRow(${idx},'qty',this.value)"></div>
+      <div><label>दाम</label><input type="number" value="${r.price}" oninput="setSaleRow(${idx},'price',this.value)"></div>
+      <button class="rm" onclick="removeSaleRow(${idx})">✕</button>
+    </div>`).join('');
+  updateSaleTotal();
+}
+function setSaleRow(idx, field, val){
+  const r = window.__saleRows[idx];
+  r[field] = val;
+  if(field==='itemId'){
+    const it = itemById(val);
+    if(it) r.price = it.salePrice;
+    renderSaleRows();
+    return;
+  }
+  updateSaleTotal();
+}
+function removeSaleRow(idx){ window.__saleRows.splice(idx,1); renderSaleRows(); }
+function updateSaleTotal(){
+  const total = window.__saleRows.reduce((s,r)=>s+(Number(r.qty)||0)*(Number(r.price)||0),0);
+  const paidEl = document.getElementById('s_paid');
+  const paid = paidEl ? Number(paidEl.value||0) : 0;
+  document.getElementById('saleTotal').textContent = inr(total);
+  document.getElementById('saleUdhar').textContent = inr(Math.max(total-paid,0));
+}
+function submitSale(custId){
+  const date = document.getElementById('s_date').value || todayStr();
+  const paid = Number(document.getElementById('s_paid').value || 0);
+  const rows = window.__saleRows.filter(r=>r.itemId && Number(r.qty)>0);
+  if(rows.length===0){ showToast('⚠️ कम से कम एक आइटम चुनें'); return; }
+  let total = 0;
+  const lineItems = [];
+  let stockWarning = false;
+  rows.forEach(r=>{
+    const it = itemById(r.itemId);
+    const qty = Number(r.qty), price = Number(r.price)||0;
+    total += qty*price;
+    lineItems.push({itemId:it.id, name:it.name, qty, unit:it.unit, price});
+    if(it.stock < qty) stockWarning = true;
+    it.stock = Number((it.stock - qty).toFixed(3));
+  });
+  db.custEntries.push({id:uid('ce'), customerId:custId, date, type:'sale', items:lineItems, debit:total, credit:Math.min(paid,total)>=0?paid:0});
+  saveDB(); closeModal(); render();
+  showToast(stockWarning ? '✅ सेव हुआ (⚠️ स्टॉक नेगेटिव जा सकता है)' : '✅ बिक्री सेव हो गई');
+}
+function openCustPaymentModal(custId){
+  setModal(`
+    <h3>पेमेंट मिला <span class="x" onclick="closeModal()">✕</span></h3>
+    <div class="field"><label>तारीख</label><input id="p_date" type="date" value="${todayStr()}"></div>
+    <div class="field"><label>राशि</label><input id="p_amt" type="number" placeholder="₹"></div>
+    <div class="field"><label>नोट (वैकल्पिक)</label><input id="p_note" placeholder="जैसे: नकद / UPI"></div>
+    <button class="btn green block" onclick="submitCustPayment('${custId}')">सेव करें</button>
+  `);
+}
+function submitCustPayment(custId){
+  const date = document.getElementById('p_date').value || todayStr();
+  const amt = Number(document.getElementById('p_amt').value || 0);
+  const note = document.getElementById('p_note').value.trim();
+  if(amt<=0){ showToast('⚠️ सही राशि डालें'); return; }
+  db.custEntries.push({id:uid('ce'), customerId:custId, date, type:'payment', debit:0, credit:amt, note});
+  saveDB(); closeModal(); render(); showToast('✅ पेमेंट दर्ज हो गया');
+}
+function deleteCustEntry(id){
+  if(!confirm('एंट्री हटाएं? स्टॉक भी वापस बदल जाएगा।')) return;
+  const e = db.custEntries.find(x=>x.id===id);
+  if(e && e.type==='sale'){
+    (e.items||[]).forEach(li=>{ const it=itemById(li.itemId); if(it) it.stock = Number((Number(it.stock)+Number(li.qty)).toFixed(3)); });
+  }
+  db.custEntries = db.custEntries.filter(x=>x.id!==id);
+  saveDB(); render();
+}
+
+// ================= SUPPLIERS =================
+function renderSuppliers(){
+  const list = db.suppliers.map(s=>({...s, bal:suppBalance(s.id)}));
+  return `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <div style="font-size:13px; color:#7a6d55;">कुल देना है: <b>${inr(totalPayable())}</b></div>
+      <button class="btn navy sm" style="background:var(--navy)" onclick="openSupplierModal()">+ नया सप्लायर</button>
+    </div>
+    <div class="card">
+      ${list.length===0?'<div class="empty">कोई सप्लायर नहीं जोड़ा गया</div>':
+      list.map(s=>`
+        <div class="row-item" onclick="openSupplierDetail('${s.id}')">
+          <div><div class="name">${esc(s.name)}</div><div class="sub">${s.phone||''}</div></div>
+          <div class="amt ${s.bal>0?'owe':'ok'}">${s.bal>0?inr(s.bal)+' देना है':'क्लियर ✅'}</div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+function openSupplierModal(){
+  setModal(`
+    <h3>नया सप्लायर <span class="x" onclick="closeModal()">✕</span></h3>
+    <div class="field"><label>नाम</label><input id="f_sname" placeholder="सप्लायर / कंपनी का नाम"></div>
+    <div class="field"><label>फोन नंबर (वैकल्पिक)</label><input id="f_sphone" placeholder="मोबाइल नंबर"></div>
+    <button class="btn navy block" style="background:var(--navy)" onclick="saveSupplier()">जोड़ें</button>
+  `);
+}
+function saveSupplier(){
+  const name = document.getElementById('f_sname').value.trim();
+  const phone = document.getElementById('f_sphone').value.trim();
+  if(!name){ showToast('⚠️ नाम डालें'); return; }
+  const s = {id:uid('supp'), name, phone};
+  db.suppliers.push(s); saveDB(); closeModal();
+  detailSupplierId = s.id; activeTab='suppliers'; render();
+}
+function openSupplierDetail(id){ detailSupplierId=id; render(); }
+function suppLedgerTableMarkup(id){
+  const entries = db.suppEntries.filter(e=>e.supplierId===id).sort((a,b)=>(a.date+a.id).localeCompare(b.date+b.id));
+  let running = 0;
+  const rowsHtml = entries.map(e=>{
+    if(e.type==='purchase'){
+      running += (e.debit - e.credit);
+      const itemRows = (e.items||[]).map(it=>`
+        <tr class="entry-item">
+          <td class="date-col"></td>
+          <td>${esc(it.name)}</td>
+          <td>${it.qty} ${esc(it.unit)}</td>
+          <td class="mono">${inr(it.qty*it.price)}</td>
+          <td></td>
+        </tr>`).join('');
+      const paidRow = e.credit>0 ? `
+        <tr class="entry-item">
+          <td class="date-col"></td>
+          <td colspan="2">उसी वक़्त दिया</td>
+          <td class="mono">−${inr(e.credit)}</td>
+          <td></td>
+        </tr>` : '';
+      return `
+        <tr class="entry-header">
+          <td class="date-col">${fmtDate(e.date)}</td>
+          <td>खरीद <span class="del-link" onclick="deleteSuppEntry('${e.id}')">हटाएं</span></td>
+          <td></td>
+          <td class="mono">+${inr(e.debit)}</td>
+          <td class="bal-col">${inr(running)}</td>
+        </tr>${itemRows}${paidRow}`;
+    } else {
+      running -= e.credit;
+      return `
+        <tr class="entry-header">
+          <td class="date-col">${fmtDate(e.date)}</td>
+          <td>पेमेंट दिया${e.note?' ('+esc(e.note)+')':''} <span class="del-link" onclick="deleteSuppEntry('${e.id}')">हटाएं</span></td>
+          <td></td>
+          <td class="mono">−${inr(e.credit)}</td>
+          <td class="bal-col">${inr(running)}</td>
+        </tr>`;
+    }
+  }).join('');
+  const tableHtml = entries.length===0 ? '<div class="empty">अभी कोई एंट्री नहीं</div>' : `
+    <table class="khata-table">
+      <thead><tr><th>तारीख</th><th>विवरण</th><th>मात्रा</th><th>राशि</th><th>बैलेंस</th></tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>`;
+  return {tableHtml, balance: running};
+}
+function renderSupplierDetail(id){
+  const s = db.suppliers.find(x=>x.id===id);
+  if(!s){ detailSupplierId=null; return renderSuppliers(); }
+  const bal = suppBalance(id);
+  const {tableHtml} = suppLedgerTableMarkup(id);
+  return `
+    <button class="btn ghost sm" onclick="detailSupplierId=null;render()">← वापस</button>
+    <div class="card" style="margin-top:10px;">
+      <div class="name" style="font-size:17px;">${esc(s.name)}</div>
+      <div class="sub">${s.phone||'फोन नंबर नहीं'}</div>
+      <div style="margin-top:8px; font-size:20px;" class="mono ${bal>0?'amt owe':'amt ok'}">${bal>0?inr(bal)+' देना बाकी':'हिसाब क्लियर ✅'}</div>
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn gold" style="flex:1" onclick="openPurchaseModal('${s.id}')">+ सामान खरीदा</button>
+        <button class="btn navy" style="flex:1; background:var(--navy)" onclick="openSuppPaymentModal('${s.id}')">₹ पेमेंट दिया</button>
+      </div>
+      <button class="btn gold block" style="margin-top:8px" onclick="shareLedgerImage('supplier','${s.id}')">📤 WhatsApp पर भेजें</button>
+    </div>
+    <h2 class="section-title">खाता (तारीख अनुसार)</h2>
+    <div class="card khata-scroll">${tableHtml}</div>
+  `;
+}
+function openPurchaseModal(suppId){
+  setModal(`
+    <h3>सामान खरीदा <span class="x" onclick="closeModal()">✕</span></h3>
+    <div class="field"><label>तारीख</label><input id="pu_date" type="date" value="${todayStr()}"></div>
+    <div id="purchItemRows"></div>
+    <button class="btn ghost sm" onclick="addPurchRow()">+ आइटम जोड़ें</button>
+    <div class="subtotal-line"><span>कुल राशि</span><span id="purchTotal">₹0</span></div>
+    <div class="field" style="margin-top:10px;"><label>अभी कितना पैसा दिया</label><input id="pu_paid" type="number" value="0" oninput="updatePurchTotal()"></div>
+    <div class="subtotal-line"><span>बाकी देना है</span><span id="purchBaaki">₹0</span></div>
+    <button class="btn gold block" style="margin-top:10px" onclick="submitPurchase('${suppId}')">खरीद सेव करें</button>
+  `);
+  window.__purchRows = [];
+  addPurchRow();
+}
+function addPurchRow(){
+  window.__purchRows.push({mode:'existing', itemId:'', newName:'', newUnit:'', qty:1, price:0});
+  renderPurchRows();
+}
+function renderPurchRows(){
+  const opts = db.items.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('');
+  document.getElementById('purchItemRows').innerHTML = window.__purchRows.map((r,idx)=>{
+    const itemSelectHtml = r.mode==='existing' ? `
+      <select onchange="setPurchRow(${idx},'itemId',this.value)">
+        <option value="">-- चुनें --</option>${opts.replace(`value="${r.itemId}"`, `value="${r.itemId}" selected`)}
+        <option value="__new__">+ नया आइटम...</option>
+      </select>` : `
+      <input placeholder="नया आइटम नाम" value="${esc(r.newName)}" oninput="setPurchRow(${idx},'newName',this.value)" style="margin-bottom:4px;">
+      <input placeholder="यूनिट (kg/piece)" value="${esc(r.newUnit)}" oninput="setPurchRow(${idx},'newUnit',this.value)">
+      <div style="font-size:10px; color:var(--navy); cursor:pointer; margin-top:2px;" onclick="setPurchRow(${idx},'mode','existing')">← मौजूदा आइटम चुनें</div>`;
+    return `
+    <div class="item-row">
+      <div><label>आइटम</label>${itemSelectHtml}</div>
+      <div><label>मात्रा</label><input type="number" value="${r.qty}" oninput="setPurchRow(${idx},'qty',this.value)"></div>
+      <div><label>दाम/यूनिट</label><input type="number" value="${r.price}" oninput="setPurchRow(${idx},'price',this.value)"></div>
+      <button class="rm" onclick="removePurchRow(${idx})">✕</button>
+    </div>`;
+  }).join('');
+  updatePurchTotal();
+}
+function setPurchRow(idx, field, val){
+  const r = window.__purchRows[idx];
+  if(field==='itemId' && val==='__new__'){ r.mode='new'; r.itemId=''; renderPurchRows(); return; }
+  r[field]=val;
+  if(field==='itemId'){
+    const it = itemById(val);
+    if(it) r.price = it.costPrice;
+    renderPurchRows();
+    return;
+  }
+  if(field==='mode') renderPurchRows();
+  updatePurchTotal();
+}
+function removePurchRow(idx){ window.__purchRows.splice(idx,1); renderPurchRows(); }
+function updatePurchTotal(){
+  const total = window.__purchRows.reduce((s,r)=>s+(Number(r.qty)||0)*(Number(r.price)||0),0);
+  const paidEl = document.getElementById('pu_paid');
+  const paid = paidEl ? Number(paidEl.value||0) : 0;
+  document.getElementById('purchTotal').textContent = inr(total);
+  document.getElementById('purchBaaki').textContent = inr(Math.max(total-paid,0));
+}
+function submitPurchase(suppId){
+  const date = document.getElementById('pu_date').value || todayStr();
+  const paid = Number(document.getElementById('pu_paid').value || 0);
+  const rows = window.__purchRows.filter(r=> (r.mode==='existing' ? r.itemId : r.newName.trim()) && Number(r.qty)>0);
+  if(rows.length===0){ showToast('⚠️ कम से कम एक आइटम भरें'); return; }
+  let total = 0;
+  const lineItems = [];
+  rows.forEach(r=>{
+    const qty = Number(r.qty), price = Number(r.price)||0;
+    total += qty*price;
+    let it;
+    if(r.mode==='existing'){
+      it = itemById(r.itemId);
+      it.stock = Number((Number(it.stock)+qty).toFixed(3));
+      it.costPrice = price;
+    } else {
+      it = {id:uid('item'), name:r.newName.trim(), unit:r.newUnit.trim()||'piece', stock:qty, lowStock:5, costPrice:price, salePrice:Math.round(price*1.2)};
+      db.items.push(it);
+    }
+    lineItems.push({itemId:it.id, name:it.name, qty, unit:it.unit, price});
+  });
+  db.suppEntries.push({id:uid('se'), supplierId:suppId, date, type:'purchase', items:lineItems, debit:total, credit:Math.min(paid,total)>=0?paid:0});
+  saveDB(); closeModal(); render(); showToast('✅ खरीद सेव हो गई, स्टॉक अपडेट हो गया');
+}
+function openSuppPaymentModal(suppId){
+  setModal(`
+    <h3>पेमेंट दिया <span class="x" onclick="closeModal()">✕</span></h3>
+    <div class="field"><label>तारीख</label><input id="sp_date" type="date" value="${todayStr()}"></div>
+    <div class="field"><label>राशि</label><input id="sp_amt" type="number" placeholder="₹"></div>
+    <div class="field"><label>नोट (वैकल्पिक)</label><input id="sp_note" placeholder="जैसे: नकद / UPI"></div>
+    <button class="btn navy block" style="background:var(--navy)" onclick="submitSuppPayment('${suppId}')">सेव करें</button>
+  `);
+}
+function submitSuppPayment(suppId){
+  const date = document.getElementById('sp_date').value || todayStr();
+  const amt = Number(document.getElementById('sp_amt').value || 0);
+  const note = document.getElementById('sp_note').value.trim();
+  if(amt<=0){ showToast('⚠️ सही राशि डालें'); return; }
+  db.suppEntries.push({id:uid('se'), supplierId:suppId, date, type:'payment', debit:0, credit:amt, note});
+  saveDB(); closeModal(); render(); showToast('✅ पेमेंट दर्ज हो गया');
+}
+function deleteSuppEntry(id){
+  if(!confirm('एंट्री हटाएं? स्टॉक भी वापस बदल जाएगा।')) return;
+  const e = db.suppEntries.find(x=>x.id===id);
+  if(e && e.type==='purchase'){
+    (e.items||[]).forEach(li=>{ const it=itemById(li.itemId); if(it) it.stock = Number((Number(it.stock)-Number(li.qty)).toFixed(3)); });
+  }
+  db.suppEntries = db.suppEntries.filter(x=>x.id!==id);
+  saveDB(); render();
+}
+
+// ---------- Share ledger as image ----------
+async function shareLedgerImage(kind, id){
+  let name, phone, tableHtml, balance, balanceLabel;
+  if(kind==='customer'){
+    const c = db.customers.find(x=>x.id===id); if(!c) return;
+    const m = custLedgerTableMarkup(id);
+    name = c.name; phone = c.phone; tableHtml = m.tableHtml; balance = m.balance;
+    balanceLabel = balance>0 ? inr(balance)+' उधार बाकी है' : 'हिसाब पूरा क्लियर है ✅';
+  } else {
+    const s = db.suppliers.find(x=>x.id===id); if(!s) return;
+    const m = suppLedgerTableMarkup(id);
+    name = s.name; phone = s.phone; tableHtml = m.tableHtml; balance = m.balance;
+    balanceLabel = balance>0 ? inr(balance)+' देना बाकी है' : 'हिसाब पूरा क्लियर है ✅';
+  }
+  showToast('⏳ इमेज बन रही है...');
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'position:fixed; left:-9999px; top:0; width:400px; background:#F1E8D6; font-family:Inter,sans-serif; color:#2B2622; padding:18px; border:3px solid #8C2F39; border-radius:4px;';
+  wrapper.innerHTML = `
+    <div style="text-align:center; margin-bottom:10px; border-bottom:2px dashed #C9B99A; padding-bottom:10px;">
+      <div style="font-family:'Baloo 2',cursive; font-size:19px; color:#6E2029; font-weight:800;">मेरी दुकान — हिसाब किताब</div>
+      <div style="font-size:11px; color:#7a6d55; margin-top:2px;">बनाया गया: ${fmtDate(todayStr())}</div>
+    </div>
+    <div style="margin-bottom:10px;">
+      <div style="font-weight:700; font-size:16px;">${esc(name)}</div>
+      <div style="font-size:11.5px; color:#7a6d55;">${phone?esc(phone):''}</div>
+    </div>
+    ${tableHtml}
+    <div style="margin-top:14px; text-align:right; font-weight:800; font-size:16px; font-family:'Roboto Mono',monospace; color:${balance>0?'#8C2F39':'#3D6B4A'};">${balanceLabel}</div>
+  `;
+  document.body.appendChild(wrapper);
+  try{
+    const canvas = await html2canvas(wrapper, {scale:2, backgroundColor:'#F1E8D6'});
+    wrapper.remove();
+    canvas.toBlob(async (blob)=>{
+      if(!blob){ showToast('⚠️ इमेज नहीं बन पाई'); return; }
+      const file = new File([blob], `${name}-khata.png`, {type:'image/png'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        try{
+          await navigator.share({files:[file], title:'हिसाब किताब', text:`${name} का हिसाब`});
+        }catch(err){ /* user cancelled share, do nothing */ }
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `${name}-khata.png`; a.click();
+        setTimeout(()=>URL.revokeObjectURL(url), 5000);
+        showToast('📥 इमेज डाउनलोड हो गई — अब WhatsApp खोलकर शेयर करें');
+      }
+    }, 'image/png');
+  }catch(err){
+    console.error(err);
+    wrapper.remove();
+    showToast('⚠️ इमेज बनाने में दिक्कत हुई');
+  }
+}
+
+// ---------- Modal helpers ----------
+function setModal(html){
+  document.getElementById('modalRoot').innerHTML = `<div class="modal-overlay" onclick="if(event.target===this) closeModal()"><div class="modal-sheet">${html}</div></div>`;
+}
+function closeModal(){ document.getElementById('modalRoot').innerHTML=''; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ---------- PWA setup: register real service worker file (manifest + icons are static files now) ----------
+if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+loadDB();
+</script>
+</body>
+</html>
